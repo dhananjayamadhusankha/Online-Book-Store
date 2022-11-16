@@ -14,8 +14,12 @@ use App\Http\Controllers\BookController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('master');
+// });
 
-Route::resource('books', BookController::class);
+Route::resource('/', BookController::class);
+Route::get('/{id}', [BookController::class, 'show']);
+Route::get('/edit/{id}', [BookController::class, 'edit']);
+Route::post('/update/{id}', [BookController::class, 'update']);
+Route::delete('/{id}', [BookController::class, 'destroy']);

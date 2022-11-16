@@ -2,18 +2,33 @@
 
 @section('content')
 
+@if(Session::has('fail'))	        
+        
+        <div class="alert alert-danger container">	        
+        
+            {{ Session::get('fail') }}	        
+        
+            @php	        
+        
+                Session::forget('fail');	        
+        
+            @endphp	        
+        
+        </div>	        
+        
+@endif
+
 <div class="card">
 	<div class="card-header">
 	<div class="row">
 			<div class="col col-md-6"><b>Edit Book Details</b></div>
 				<div class="col col-md-6">
-					<a href="{{ route('books.index') }}" class="btn btn-secondary btn-sm float-end">View All</a>
+					<a href="{{ route('index') }}" class="btn btn-secondary btn-sm float-end">View All</a>
 				</div>
 			</div>
 	<div class="card-body">
-		<form method="post" action="{{ route('books.update', $book->id) }}" enctype="multipart/form-data">
+		<form method="POST" action="{{ URL::to('/update/'.$book->id) }}" enctype="multipart/form-data">
 			@csrf
-			@method('PUT')
 			<div class="row mb-3">
 				<label class="col-sm-2 col-label-form">Book Title</label>
 				<div class="col-sm-10">

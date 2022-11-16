@@ -4,7 +4,7 @@
 
 @if($message = Session::get('success'))
 
-<div class="alert alert-success">
+<div class="alert alert-success" id="alertDismissible">
 	{{ $message }}
 </div>
 
@@ -15,7 +15,7 @@
 		<div class="row">
 			<div class="col col-md-6"><b>Book Data</b></div>
 			<div class="col col-md-6">
-				<a href="{{ route('books.create') }}" class="btn btn-success btn-sm float-end">Add Book</a>
+				<a href="{{ route('create') }}" class="btn btn-success btn-sm float-end">Add Book</a>
 			</div>
 		</div>
 	</div>
@@ -38,11 +38,11 @@
 						<td>{{ $row->book_cost }}</td>
 					
 						<td>
-							<form method="post" action="{{ route('books.destroy', $row->id) }}">
+							<form method="post" action="{{ route('destroy', $row->id) }}">
 								@csrf
 								@method('DELETE')
-								<a href="{{ route('books.show', $row->id) }}" class="btn btn-primary btn-sm margin-left">View</a>
-								<a href="{{ route('books.edit', $row->id) }}" class="btn btn-warning btn-sm margin-left">Edit</a>
+								<a href="{{ route('show', $row->id) }}" class="btn btn-primary btn-sm margin-left">View</a>
+								<a href="{{ URL::to('/edit/'. $row->id) }}" class="btn btn-warning btn-sm margin-left">Edit</a>
 								<input type="submit" class="btn btn-danger btn-sm margin-left" value="Delete" />
 							</form>
 							

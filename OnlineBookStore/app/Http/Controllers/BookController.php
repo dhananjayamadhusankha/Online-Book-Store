@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -38,7 +39,9 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'book_title'      =>  'required',
+            'book_title'      =>  'required|unique:books|max:255',
+            'book_author'     =>  'required',
+            'book_cost'       =>  'required'
         ]);
 
         $book = new Book;
@@ -51,7 +54,7 @@ class BookController extends Controller
 
         $book->save();
 
-        return redirect()->route('books.index')->with('success', 'Book Added successfully.');
+        return redirect()->route('index')->with('success', 'Book Added successfully.');
     }
 
     /**
@@ -60,8 +63,11 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show($id)
     {
+        // $book = Book::findOne($id);
+        $book = DB::table('books')->where('id' ,$id)->first();
+        // dd($book);
         return view('show', compact('book'));
     }
 
@@ -71,8 +77,10 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function edit(Book $book)
+    public function edit($id)
     {
+        $book = DB::table('books')->where('id' ,$id)->first();
+
         return view('edit', compact('book'));
     }
 
@@ -83,25 +91,55 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
+        
+
         $request->validate([
-            'book_title'      =>  'required|unique:books|max:255',
+            'book_title'      =>  'required|max:255',
             'book_author'     =>  'required',
-            'book_cost'       =>  'required',
+            'book_cost'       =>  'required'
         ]);
 
-        $book = Book::find($request->hidden_id);
+        $bookCheck = DB::table('books')->where('id' ,$id)->first();
 
-        $book->book_title = $request->book_title;
+        if ($bookCheck->book_title == $request-> book_title) {
+                $book = Book::find($request->hidden_id);
+
+                $book->book_title = $request->book_title;
+                
+                $book->book_author = $request->book_author;
         
-        $book->book_author = $request->book_author;
+                $book->book_cost = $request->book_cost;
+        
+                $book->save();
+        
+                return redirect()->route('index')->with('success', 'Book Data has been updated successfully');
+        }
+        else{
+            $isBookName = DB::table('books')->where('book_title', $request->book_title)->first();
+        
+            // dd($isBookName);
+    
+            if($isBookName){
+                // dd('book name already exists');
 
-        $book->book_cost = $request->book_cost;
-
-        $book->save();
-
-        return redirect()->route('books.index')->with('success', 'Book Data has been updated successfully');
+                return back()->with('fail', 'Book Name already exists')->withInput();
+            }
+            else{
+                $book = Book::find($request->hidden_id);
+    
+                $book->book_title = $request->book_title;
+                
+                $book->book_author = $request->book_author;
+        
+                $book->book_cost = $request->book_cost;
+        
+                $book->save();
+        
+                return redirect()->route('index')->with('success', 'Book Data has been updated successfully');
+            }
+        }
     }
 
     /**
@@ -110,10 +148,11 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy($id)
     {
-        $book->delete();
 
-        return redirect()->route('books.index')->with('Success', 'Book Data deleted successfully');
+        DB::table('books')->where('id', $id)->delete();
+
+        return back()->with('success', 'Book Data deleted successfully');
     }
 }
